@@ -33,6 +33,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import l9g.webapp.signaturepaddemo.service.SignaturePad;
 import l9g.webapp.signaturepaddemo.service.SignaturePadService;
 import l9g.webapp.signaturepaddemo.service.SignedJwtService;
@@ -43,13 +44,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -73,8 +77,33 @@ public class ApiSignaturePadController
 
   private final AuthService authService;
 
+  private final Map<String, DeferredResult<ResponsePayload>> waitingRequests =
+    new ConcurrentHashMap<>();
+
   @Value("${app.base-url}")
   private String appBaseUrl;
+
+  @GetMapping("/wait-for-response")
+  @ResponseBody
+  public DeferredResult<ResponsePayload> waitForResponse(@RequestParam(name = "uuid") String padUuid)
+  {
+    log.debug("waitForResponse {}", padUuid);
+
+    DeferredResult<ResponsePayload> deferred = new DeferredResult<>(180_000L);
+
+    deferred.onTimeout(() ->
+    {
+      log.warn("Timeout bei padUuid={}", padUuid);
+      ResponsePayload payload = new ResponsePayload("timeout", null);
+      deferred.setResult(payload);
+    });
+
+    deferred.onCompletion(() -> waitingRequests.remove(padUuid));
+    waitingRequests.put(padUuid, deferred);
+
+    log.debug("waitForResponse - done");
+    return deferred;
+  }
 
   @GetMapping(path = "/connect-qrcode", produces = MediaType.IMAGE_PNG_VALUE)
   public void connectQrcode(
@@ -176,6 +205,8 @@ public class ApiSignaturePadController
     SignaturePad signaturePad = authService.authCheck(padUuid, true);
     SignedJWT signedJWT = authService.verifyJwt(signaturePad, signatureJwt);
 
+    DeferredResult<ResponsePayload> deferred = waitingRequests.get(padUuid);
+
     try
     {
       String issuer = signedJWT.getJWTClaimsSet().getIssuer();
@@ -198,10 +229,23 @@ public class ApiSignaturePadController
       log.debug("mail={}", signedJWT.getJWTClaimsSet().getClaimAsString("mail"));
 
       signedJwtService.storeSignedJWT(signedJWT.getJWTClaimsSet().getSubject(), signatureJwt);
+
+      if(deferred != null)
+      {
+        ResponsePayload payload = new ResponsePayload("ok", sigpngBase64);
+        deferred.setResult(payload);
+      }
     }
     catch(ParseException e)
     {
       log.error("Error parsing or verifying JWT", e);
+
+      if(deferred != null)
+      {
+        ResponsePayload payload = new ResponsePayload("error", null);
+        deferred.setResult(payload);
+      }
+
       throw new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
         "Invalid JWT payload or signature"
@@ -236,6 +280,13 @@ public class ApiSignaturePadController
     log.info("json: {}", json);
 
     SignaturePad signaturePad = authService.authCheck(padUuid, true);
+
+    DeferredResult<ResponsePayload> deferred = waitingRequests.get(padUuid);
+    if(deferred != null)
+    {
+      ResponsePayload payload = new ResponsePayload("cancel", null);
+      deferred.setResult(payload);
+    }
   }
 
 }

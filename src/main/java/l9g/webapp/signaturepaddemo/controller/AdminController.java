@@ -106,4 +106,32 @@ public class AdminController
     return "validate-new-pad";
   }
 
+  @GetMapping("/wait-for-response")
+  public String waitForResponse(
+    @RequestParam("uuid") String padUUID, 
+    @RequestParam("userId") String userId, 
+    Model model)
+    throws NoSuchAlgorithmException, IOException
+  {
+    log.debug("wait-for-response uuid={}", padUUID);
+    Locale locale = LocaleContextHolder.getLocale();
+    log.debug("locale={}", locale);
+
+    SignaturePad signaturePad =
+      signaturePadService.getSignaturePadByUUID(padUUID);
+
+    if(signaturePad == null)
+    {
+      throw new ResponseStatusException(
+        HttpStatus.NOT_FOUND,
+        "Signature pad UUID not found!"
+      );
+    }
+
+    model.addAttribute("locale", locale.toString());
+    model.addAttribute("pad", signaturePad);
+    model.addAttribute("userId", userId);
+    return "wait-for-response";
+  }
+
 }
