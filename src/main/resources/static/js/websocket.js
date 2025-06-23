@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* global Swal, jose, wsBaseUrl, heartbeatEnabled */
+/* global Swal */
 
 // ----------------------------------------------------------------------------
 // -- WebSocket ---------------------------------------------------------------
