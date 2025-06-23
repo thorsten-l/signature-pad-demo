@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+Copyright 2025 Thorsten Ludewig (t.ludewig@gmail.com).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Validate New Pad</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}"/>
+    <link th:rel="stylesheet" th:href="@{/css/signature-pad.css}"/>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Wait for response</h1>
+
+      <div class="mb-4">
+        Name: <em><span th:text="${pad.name}">PAD-NAME</span></em> <br/>
+        UUID: <em><span th:text="${pad.uuid}">PAD-KeyID</span></em>
+
+        <div id="message" style="font-weight: bold;">Verbindung wird aufgebaut …</div>
+        <div id="signature" style="margin-top:1em; height: 292px; width:688px; border: solid grey 4px"></div>
+
+      </div>
+
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jose/index.umd.min.js}"></script>
+
+    <script th:inline="javascript">
+      const padUuid = /*[[${pad.uuid}]]*/ 'unknown-uuid';
+      const padName = /*[[${pad.name}]]*/ 'unknown-name';
+      const userId = /*[[${userId}]]*/ 'unknown-userid';
+
+      console.log(padUuid);
+      console.log(padName);
+      console.log(userId);
+      console.log("send show ...");
+
+      const url = `/api/v1/signature-pad/show?uuid=${encodeURIComponent(padUuid)}&uid=${encodeURIComponent(userId)}`;
+      fetch(url, {method: 'GET'});
+
+      console.log("wait ...");
+
+      const pollUrl = '/api/v1/signature-pad/wait-for-response?uuid=' + encodeURIComponent(padUuid);
+
+      fetch(pollUrl).then(async response => {
+        if (!response.ok)
+        {
+          const err = await response.text();
+          throw new Error(err || 'Fehler');
+        }
+        return response.json();
+      }).then(data => {
+        const msgEl = document.getElementById('message');
+        if (data.status === 'cancel')
+        {
+          msgEl.textContent = 'Der Kunde hat abgebrochen.';
+        }
+        else if (data.status === 'timeout')
+        {
+          msgEl.textContent = 'TIMEOUT!';
+          // TODO: send CANCEL to pad
+        }
+        else if (data.status === 'ok')
+        {
+          msgEl.textContent = 'Unterschrift erhalten:';
+          const img = document.createElement('img');
+          img.src = 'data:image/png;base64,' + data.sigpng;
+          img.alt = 'Unterschrift';
+          img.style = "width: 680px";
+          document.getElementById('signature').appendChild(img);
+        }
+      }).catch(err => {
+        document.getElementById('message').textContent = 'Fehler: ' + err.message;
+      });
+    </script>
+  </body>
+</html>

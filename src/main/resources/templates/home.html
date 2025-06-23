@@ -43,12 +43,12 @@ limitations under the License.
             <tr th:each="sps : ${signaturePadSessions}">
               <td th:text="${sps.padUuid()}">padUuid</td>
               <td>
-                <button type="button"
-                        class="btn btn-secondary js-show-pad"
-                        th:attr="data-pad-uuid=${sps.padUuid()}, data-userid='user123'"
-                        th:text="${sps.name()}"
-                        onclick="showPad(this)">
-                </button>
+                <a 
+                  target="_blank"
+                  class="btn btn-primary js-show-pad"
+                  th:href="@{/admin/wait-for-response(uuid=${sps.padUuid()}, userId=user123)}"
+                  th:text="${sps.name()}">
+                </a>
               </td>
             </tr>
           </tbody>
@@ -58,14 +58,5 @@ limitations under the License.
 
     </div>    
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-    <script>
-      function showPad(button)
-      {
-        const padUuid = button.getAttribute("data-pad-uuid");
-        const userId = button.getAttribute("data-userid");
-        const url = `/api/v1/signature-pad/show?uuid=${encodeURIComponent(padUuid)}&uid=${encodeURIComponent(userId)}`;
-        fetch(url, {method: 'GET'});
-      }
-    </script>
   </body>
 </html>
