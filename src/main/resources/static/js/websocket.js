@@ -54,7 +54,7 @@ function checkHeartbeat()
   {
     activateSignaturePad(false);
     console.log("No heartbeat received for 30 seconds. Reconnecting...");
-    showAlert("alert.error.connectionLost", "alert.error.connectionLost", "error");
+    showAlert("alert.error.connectionLost.title", "alert.error.connectionLost.text", "error");
     ws.close();
   }
 }
@@ -97,7 +97,7 @@ function connect()
     setStatusLight(true);
     switchLang(defaultLang);
     console.log("WebSocket connection opened.");
-    showAlert("alert.websocket.open", "alert.websocket.open", "success");
+    showAlert("alert.websocket.open.title", "alert.websocket.open.text", "success");
     lastHeartbeatTimestamp = Date.now();
   };
 
@@ -107,7 +107,7 @@ function connect()
     activateSignaturePad(false);
     setStatusLight(false);
     
-    showAlert("alert.error.connectionLost", "alert.error.connectionLost", "error");
+    showAlert("alert.error.connectionLost.title", "alert.error.connectionLost.text", "error");
     reconnect();
   };
 
@@ -116,7 +116,7 @@ function connect()
     setStatusLight(false);
     console.log("WebSocket error: ", error);
     switchLang(defaultLang);
-    showAlert("alert.error.websocket", "alert.error.websocket", "error");
+    showAlert("alert.error.websocket.title", "alert.error.websocket.text", "error");
   };
 }
 

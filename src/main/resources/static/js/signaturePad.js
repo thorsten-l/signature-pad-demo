@@ -110,7 +110,7 @@ cancelButton.addEventListener("click", () => {
 okButton.addEventListener("click", async () => {
   if (signaturePad.isEmpty())
   {
-    showAlert("alert.error.signature", "alert.error.signature", "error");
+    showAlert("alert.error.signature.title", "alert.error.signature.text", "error");
   }
   else
   {
@@ -156,12 +156,12 @@ okButton.addEventListener("click", async () => {
 
     if (response.ok)
     {
-      showAlert("alert.success.signatureSent", "alert.success.signatureSent", "success");
+      showAlert("alert.success.signatureSent.title", "alert.success.signatureSent.text", "success");
     }
     else
     {
       const errorText = await response.text();
-      showAlert("alert.error.sendingSignature", "alert.error.sendingSignature", "error", errorText);
+      showAlert("alert.error.sendingSignature.title", "alert.error.sendingSignature.text", "error", errorText);
     }
     switchLang(defaultLang);
   }
