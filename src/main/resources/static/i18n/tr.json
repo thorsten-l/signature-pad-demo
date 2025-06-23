@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "İmza Paneli",
+  "heartbeat.disabled": "devre dışı",
+  "label.birthday": "Doğum Tarihi",
+  "label.userid": "Kullanıcı Kimliği",
+  "label.email": "E-posta",
+  "label.semesterAddress": "Dönem Adresi",
+  "label.homeAddress": "Ev Adresi",
+  "consentText": "Bu belgeyi imzalayarak bu üniversitenin BT kullanım politikasını kabul ediyorum.",
+  "signature.signAbove": "Buraya imzalayın",
+  "btn.clear": "Temizle",
+  "btn.cancel": "İptal",
+  "btn.ok": "Tamam",
+  "alert.cancel.title": "İPTAL",
+  "alert.cancel.text": "İptal düğmesine basıldı",
+  "alert.error.signature": "Lütfen önce imza atın.",
+  "alert.websocket.open": "WebSocket bağlantısı açıldı.",
+  "alert.error.websocket": "WebSocket bağlantı hatası.",
+  "alert.error.connectionLost": "Bağlantı kaybedildi!",
+  "alert.success.signatureSent": "İmza başarıyla gönderildi.",
+  "alert.error.sendingSignature": "İmza gönderilirken hata: {0}",
+  "alert.error.unregistered": "Bu imza paneli kayıtlı değil! Lütfen yöneticinizle iletişime geçin."
+}

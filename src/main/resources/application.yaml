@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: signature-pad-demo
+
+  profiles:
+    active: default
+  config:
+    import: optional:file:config.yaml
+
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+  ssl:
+    bundle:
+      jks:
+        web-server:
+          key:
+            alias: "server"
+            password: "storepass"
+          keystore:
+            location: "file:server.p12"
+            password: "storepass"
+            type: "PKCS12"
+
+server:
+  port: 3443
+  servlet:
+    context-path: /
+    session:
+      timeout: 9h
+  ssl:
+    bundle: "web-server"
+
+
+logging:
+  pattern:
+    console: "%date{yyyy-MM-dd HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger:%line - %yellow(%msg %n)"
+  level:
+    root: INFO
+    com.zaxxer.hikari.pool.HikariPool: ERROR
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
+   
+app:
+  development: false
+  base-url: https://signpad.dev.sonia.de:3443
+  ws-url: wss://signpad.dev.sonia.de:3443
+
+scheduler:
+  heartbeat:
+    enabled: true
+    rate: 15000

@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "Панель підпису",
+  "heartbeat.disabled": "відключено",
+  "label.birthday": "Дата народження",
+  "label.userid": "ID користувача",
+  "label.email": "Електронна пошта",
+  "label.semesterAddress": "Адреса семестру",
+  "label.homeAddress": "Домашня адреса",
+  "consentText": "Підписуючи цей документ, я приймаю політику використання ІТ цієї університету.",
+  "signature.signAbove": "Підпишіть тут",
+  "btn.clear": "Очистити",
+  "btn.cancel": "Скасувати",
+  "btn.ok": "ОК",
+  "alert.cancel.title": "СКАСУВАТИ",
+  "alert.cancel.text": "Натиснуто кнопку скасування",
+  "alert.error.signature": "Будь ласка, спочатку підпишіться.",
+  "alert.websocket.open": "З’єднання WebSocket встановлено.",
+  "alert.error.websocket": "Помилка з’єднання WebSocket.",
+  "alert.error.connectionLost": "З’єднання втрачено!",
+  "alert.success.signatureSent": "Підпис успішно відправлено.",
+  "alert.error.sendingSignature": "Помилка під час відправки підпису: {0}",
+  "alert.error.unregistered": "Ця панель підпису не зареєстрована! Будь ласка, зверніться до адміністратора."
+}

@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "لوحة التوقيع",
+  "heartbeat.disabled": "معطّل",
+  "label.birthday": "تاريخ الميلاد",
+  "label.userid": "معرّف المستخدم",
+  "label.email": "البريد الإلكتروني",
+  "label.semesterAddress": "عنوان الفصل الدراسي",
+  "label.homeAddress": "عنوان المنزل",
+  "consentText": "بتوقيعي على هذا المستند أوافق على سياسة استخدام تكنولوجيا المعلومات في هذه الجامعة.",
+  "signature.signAbove": "وقع هنا",
+  "btn.clear": "مسح",
+  "btn.cancel": "إلغاء",
+  "btn.ok": "موافق",
+  "alert.cancel.title": "إلغاء",
+  "alert.cancel.text": "تم الضغط على إلغاء",
+  "alert.error.signature": "يرجى التوقيع أولاً.",
+  "alert.websocket.open": "تم فتح اتصال WebSocket.",
+  "alert.error.websocket": "خطأ في اتصال WebSocket.",
+  "alert.error.connectionLost": "انقطع الاتصال!",
+  "alert.success.signatureSent": "تم إرسال التوقيع بنجاح.",
+  "alert.error.sendingSignature": "خطأ في إرسال التوقيع: {0}",
+  "alert.error.unregistered": "جهاز التوقيع غير مسجل! يرجى الاتصال بمسؤول النظام."
+}

@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "Signature",
+  "heartbeat.disabled": "désactivé",
+  "label.birthday": "Date de naissance",
+  "label.userid": "ID utilisateur",
+  "label.email": "E-mail",
+  "label.semesterAddress": "Adresse du semestre",
+  "label.homeAddress": "Adresse domiciliaire",
+  "consentText": "En signant ce document, j’accepte la politique d’utilisation informatique de cette université.",
+  "signature.signAbove": "Signer ici",
+  "btn.clear": "Effacer",
+  "btn.cancel": "Annuler",
+  "btn.ok": "OK",
+  "alert.cancel.title": "ANNULER",
+  "alert.cancel.text": "Bouton d'annulation pressé",
+  "alert.error.signature": "Veuillez d'abord fournir une signature.",
+  "alert.websocket.open": "Connexion WebSocket établie.",
+  "alert.error.websocket": "Erreur de connexion WebSocket.",
+  "alert.error.connectionLost": "Connexion perdue !",
+  "alert.success.signatureSent": "Signature envoyée avec succès.",
+  "alert.error.sendingSignature": "Erreur lors de l'envoi de la signature : {0}",
+  "alert.error.unregistered": "Cette tablette de signature n'est pas enregistrée ! Veuillez contacter votre administrateur."
+}

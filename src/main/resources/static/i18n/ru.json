@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "Панель подписи",
+  "heartbeat.disabled": "отключено",
+  "label.birthday": "Дата рождения",
+  "label.userid": "ID пользователя",
+  "label.email": "Электронная почта",
+  "label.semesterAddress": "Адрес семестра",
+  "label.homeAddress": "Домашний адрес",
+  "consentText": "Подписывая этот документ, я принимаю политику использования ИТ этого университета.",
+  "signature.signAbove": "Подпишите здесь",
+  "btn.clear": "Очистить",
+  "btn.cancel": "Отмена",
+  "btn.ok": "ОК",
+  "alert.cancel.title": "ОТМЕНА",
+  "alert.cancel.text": "Нажата кнопка отмены",
+  "alert.error.signature": "Пожалуйста, сначала поставьте подпись.",
+  "alert.websocket.open": "Соединение WebSocket установлено.",
+  "alert.error.websocket": "Ошибка соединения WebSocket.",
+  "alert.error.connectionLost": "Соединение потеряно!",
+  "alert.success.signatureSent": "Подпись успешно отправлена.",
+  "alert.error.sendingSignature": "Ошибка при отправке подписи: {0}",
+  "alert.error.unregistered": "Этот планшет для подписи не зарегистрирован! Пожалуйста, свяжитесь с администратором."
+}

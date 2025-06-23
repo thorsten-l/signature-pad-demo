@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "签名板",
+  "heartbeat.disabled": "已禁用",
+  "label.birthday": "出生日期",
+  "label.userid": "用户 ID",
+  "label.email": "电子邮件",
+  "label.semesterAddress": "学期地址",
+  "label.homeAddress": "家庭地址",
+  "consentText": "通过签署此文件，我接受本大学的 IT 使用政策。",
+  "signature.signAbove": "在此签名",
+  "btn.clear": "清除",
+  "btn.cancel": "取消",
+  "btn.ok": "确定",
+  "alert.cancel.title": "取消",
+  "alert.cancel.text": "已按取消按钮",
+  "alert.error.signature": "请先提供签名。",
+  "alert.websocket.open": "WebSocket 连接已建立。",
+  "alert.error.websocket": "WebSocket 连接错误。",
+  "alert.error.connectionLost": "连接丢失！",
+  "alert.success.signatureSent": "签名已成功发送。",
+  "alert.error.sendingSignature": "发送签名时出错：{0}",
+  "alert.error.unregistered": "此签名板未注册！请联系您的管理员。"
+}

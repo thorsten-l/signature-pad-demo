@@ -1,0 +1,23 @@
+{
+  "nav.signaturePad": "Signature Pad",
+  "heartbeat.disabled": "disabled",
+  "label.birthday": "Birthday",
+  "label.userid": "User ID",
+  "label.email": "E-Mail",
+  "label.semesterAddress": "Semester Address",
+  "label.homeAddress": "Home Address",
+  "consentText": "By signing this document, I accept the IT usage policy of this university.",
+  "signature.signAbove": "Sign above",
+  "btn.clear": "Clear",
+  "btn.cancel": "Cancel",
+  "btn.ok": "OK",
+  "alert.cancel.title": "CANCEL",
+  "alert.cancel.text": "Cancel button pressed",
+  "alert.error.signature": "Please provide a signature first.",
+  "alert.websocket.open": "WebSocket connection opened.",
+  "alert.error.websocket": "WebSocket connection error.",
+  "alert.error.connectionLost": "Connection lost!",
+  "alert.success.signatureSent": "Signature successfully sent.",
+  "alert.error.sendingSignature": "Error sending signature: {0}",
+  "alert.error.unregistered": "This signature pad is unregistered! Please contact your administrator."
+}

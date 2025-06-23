@@ -1,0 +1,113 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Signature Pad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="manifest" th:href="@{/manifest.json}">
+      <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+      <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}"/>
+      <link th:rel="stylesheet" th:href="@{/css/signature-pad.css}"/>
+  </head>
+
+  <body onselectstart="return false">
+
+    <nav class="app-header navbar navbar-expand"> 
+      <div class="container-fluid"> 
+        <ul class="navbar-nav">
+          <li id="green-light" class="nav-item" style="display: none; align-items: center;">
+            <img th:src="@{/images/green.svg}" class="monitor-status-light" />
+          </li>
+          <li id="red-light" class="nav-item" style="display: inline-flex; align-items: center;">
+            <img th:src="@{/images/red.svg}" class="monitor-status-light" />
+          </li>
+          <li class="nav-item d-none d-md-block"> 
+            <a th:href="@{/signature-pad}" class="nav-link"><i class="fas fa-signature me-1"></i> Signature Pad</a> 
+          </li>
+        </ul> 
+      </div> 
+    </nav> 
+
+    <div id="signpad-standby" style="display: block">
+      <div class="signpad-logo-container">
+        <div class="signpad-logo"><i class="fas fa-signature me-1"></i> Signature Pad</div>
+      </div>
+      <div class="heartbeat-container">
+        <div class="heartbeat"><i class="fas fa-heartbeat me-1"></i>
+          <span id="heartbeat">disabled</span></div>
+      </div>
+    </div>
+
+    <div id="signpad-active" style="display: none">
+
+      <div class="userinfo-container">
+        <img id="userinfo-jpegpoto" class="userinfo-jpegpoto" th:src="@{/images/loading.png}"/>
+        <div class="userinfo-text">
+          <div id="userinfo-name" class="userinfo-name"></div>
+
+          <label>Birthday</label>
+          <div id="userinfo-birthday"></div>
+
+          <label>User-Id</label>
+          <div id="userinfo-userid"></div>
+
+          <label>E-Mail</label>
+          <div id="userinfo-email"></div>
+
+          <div id="userinfo-semester-container" style="display: none">
+            <label>Semester Address</label>
+            <div id="userinfo-semester">abc</div>
+          </div>
+
+          <div id="userinfo-home-container" style="display: none">
+            <label>Home Address</label>
+            <div id="userinfo-home">def</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="user-consens">
+        By signing this document, I accept the IT usage policy of this university.
+      </div>
+      
+      <div id="signature-pad-container" class="signature-container">
+        <div id="signature-pad" class="signature-pad">
+          <div class="signature-pad--body">
+            <canvas></canvas>
+          </div>
+          <div class="signature-pad--footer text-center">
+            <div class="description mb-2">Sign above</div>
+            <div class="signature-pad--actions grid-4">
+              <button class="btn btn-secondary btn-lg" data-action="clear">
+                <i class="fas fa-eraser me-2"></i>Clear
+              </button>
+              <div></div>
+              <button class="btn btn-danger btn-lg" data-action="cancel">
+                <i class="fas fa-times-circle me-2"></i>Cancel
+              </button>
+              <button class="btn btn-success btn-lg" data-action="ok">
+                <i class="fas fa-check-circle me-2"></i>OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:inline="javascript">
+      const wsBaseUrl = /*[[${wsBaseUrl}]]*/ 'unknown-ws-base-url';
+      const heartbeatEnabled = /*[[${heartbeatEnabled}]]*/ true;
+      console.log(wsBaseUrl);
+      console.log(heartbeatEnabled);
+    </script>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/signature_pad/dist/signature_pad.umd.min.js}"></script>
+    <script th:src="@{/js/sweetalert2/sweetalert2.all.min.js}"></script>
+    <script th:src="@{/js/jose/index.umd.min.js}"></script>
+    <script th:src="@{/js/signature-pad-app.js}"></script>
+
+  </body>
+</html>
