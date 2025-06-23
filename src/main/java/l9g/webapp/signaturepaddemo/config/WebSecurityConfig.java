@@ -18,6 +18,7 @@ package l9g.webapp.signaturepaddemo.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,7 +35,8 @@ public class WebSecurityConfig
   private static final String CSP_POLICY =
     "default-src 'self'; "
     + "img-src 'self' data:;"
-    + "style-src 'self' 'unsafe-inline';";
+    + "style-src 'self' 'unsafe-inline';"
+    + "script-src 'self' 'unsafe-inline';";
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -43,9 +45,15 @@ public class WebSecurityConfig
     log.debug("securityFilterChain");
     http
       .csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/signature-pad/**"))
-      .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-      .headers(headers -> headers
-      .contentSecurityPolicy(csp -> csp.policyDirectives(CSP_POLICY)));
+      .authorizeHttpRequests(auth
+        -> auth
+        .requestMatchers(HttpMethod.GET, "/api/v1/signature-pad/**").permitAll()
+        .requestMatchers(HttpMethod.POST, "/api/v1/signature-pad/**").permitAll()
+        .requestMatchers("/api/v1/signature-pad/**").denyAll()
+        .anyRequest().permitAll())
+      .headers(headers
+        -> headers
+        .contentSecurityPolicy(csp -> csp.policyDirectives(CSP_POLICY)));
     return http.build();
   }
 }
