@@ -65,10 +65,10 @@ public class ApiUserInfoController
     }
     
     DtoAddress semester = new DtoAddress(
-      "Ostfalia", "Salzdalumer Str 46/48", "38302", "Wolfenbüttel", 
+      "c/o M. Maier", "Musterstr. Str 1701", "38302", "Wolfenbüttel", 
       "Niedersachsen", "Deutschland");
     DtoAddress home = new DtoAddress(
-      null, "Neuer Weg 51", "38302", "Wolfenbüttel", 
+      null, "Neuer Weg 4711", "38302", "Wolfenbüttel", 
       "Niedersachsen", "Deutschland");
 
     String jpegPhoto;

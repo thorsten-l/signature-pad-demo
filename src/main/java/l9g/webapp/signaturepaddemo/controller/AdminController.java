@@ -99,10 +99,11 @@ public class AdminController
       );
     }
 
+    String privateJwk = signaturePad.createPrivateJWK();
     signaturePadService.storeSignaturePad(signaturePad);
     model.addAttribute("locale", locale.toString());
     model.addAttribute("pad", signaturePad);
-    model.addAttribute("padJwkJson", signaturePad.createPrivateJWK());
+    model.addAttribute("padJwkJson", privateJwk);
     return "validate-new-pad";
   }
 

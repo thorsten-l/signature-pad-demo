@@ -88,6 +88,8 @@ public class AuthService
     {
       RSAKey publicJwk = (RSAKey)JWK.parse(signaturePad.getPublicJwk());
 
+      log.debug("publicJwk={}", publicJwk);
+      
       signedJwt = SignedJWT.parse(jwt);
       JWSVerifier verifier = new RSASSAVerifier(publicJwk);
 

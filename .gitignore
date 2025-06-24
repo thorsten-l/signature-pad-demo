@@ -37,4 +37,5 @@ build/
 
 config.yaml
 config-off.yaml
+config-off.yaml
 server.p12

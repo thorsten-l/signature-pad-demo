@@ -32,6 +32,22 @@ const bodyEl = document.body;
 const wsBaseUrl = bodyEl.getAttribute('data-ws-base-url') || 'unknown-ws-base-url';
 const heartbeatEnabled = bodyEl.getAttribute('data-heartbeat-enabled') === 'true';
 
+function formatTimestamp(ts)
+{
+  const d = new Date(ts);
+  const pad2 = n => String(n).padStart(2, '0');
+
+  const yyyy = d.getFullYear();
+  const mm = pad2(d.getMonth() + 1);
+  const dd = pad2(d.getDate());
+
+  const HH = pad2(d.getHours());
+  const MM = pad2(d.getMinutes());
+  const SS = pad2(d.getSeconds());
+
+  return `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
+}
+
 function setStatusLight(status)
 {
   if (status)
