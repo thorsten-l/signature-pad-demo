@@ -85,10 +85,19 @@ function connect()
       signaturePad.clear();
     }
 
+    if (dtoEvent.event === "hide")
+    {
+      console.log("hide event received");
+      switchLang(defaultLang);
+      signaturePad.clear();
+      activateSignaturePad(false);
+    }
+
     if (dtoEvent.event === "error")
     {
       setStatusLight(false);
       showAlert("ERROR", dtoEvent.message, "error");
+      switchLang(defaultLang);
     }
   };
 

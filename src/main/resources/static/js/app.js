@@ -19,4 +19,5 @@ import './userInfo.js';
 import './signaturePad.js';
 import './websocket.js';
 import './alerts.js';
+import './countdown.js';
 

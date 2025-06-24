@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -83,17 +82,36 @@ public class ApiSignaturePadController
   @Value("${app.base-url}")
   private String appBaseUrl;
 
+  @Value("${app.signature-pad.timeout:180000}")
+  private long signaturePadTimeout;
+
   @GetMapping("/wait-for-response")
   @ResponseBody
   public DeferredResult<ResponsePayload> waitForResponse(@RequestParam(name = "uuid") String padUuid)
   {
     log.debug("waitForResponse {}", padUuid);
 
-    DeferredResult<ResponsePayload> deferred = new DeferredResult<>(180_000L);
+    DeferredResult<ResponsePayload> checkDeferred = waitingRequests.get(padUuid);
+
+    if(checkDeferred != null)
+    {
+      checkDeferred.setResult(null);
+      waitingRequests.remove(padUuid);
+    }
+
+    DeferredResult<ResponsePayload> deferred = new DeferredResult<>(signaturePadTimeout);
 
     deferred.onTimeout(() ->
     {
       log.warn("Timeout bei padUuid={}", padUuid);
+      try
+      {
+        hide(padUuid);
+      }
+      catch(IOException ex)
+      {
+        log.error("hide signature pad", ex);
+      }
       ResponsePayload payload = new ResponsePayload("timeout", null);
       deferred.setResult(payload);
     });
@@ -253,20 +271,6 @@ public class ApiSignaturePadController
     }
   }
 
-  @GetMapping(path = "/show",
-              produces = MediaType.APPLICATION_JSON_VALUE)
-  public void show(
-    @RequestParam("uuid") String padUuid,
-    @RequestParam("uid") String userId,
-    HttpServletResponse response
-  )
-    throws IOException
-  {
-    log.debug("padUuid = {}, uid = {}", padUuid, userId);
-    signaturePadWebSocketHandler
-      .fireEventToPad(new DtoEvent(DtoEvent.EVENT_SHOW, userId), padUuid);
-  }
-
   @PostMapping(path = "/cancel",
                consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -276,7 +280,7 @@ public class ApiSignaturePadController
   )
     throws IOException
   {
-    log.debug("cancel called");
+    log.debug("cancel button pressed");
     log.info("json: {}", json);
 
     SignaturePad signaturePad = authService.authCheck(padUuid, true);
@@ -287,6 +291,31 @@ public class ApiSignaturePadController
       ResponsePayload payload = new ResponsePayload("cancel", null);
       deferred.setResult(payload);
     }
+  }
+
+  @GetMapping(path = "/show",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public void show(
+    @RequestParam("uuid") String padUuid,
+    @RequestParam("uid") String userId
+  )
+    throws IOException
+  {
+    log.debug("show padUuid = {}, uid = {}", padUuid, userId);
+    signaturePadWebSocketHandler
+      .fireEventToPad(new DtoEvent(DtoEvent.EVENT_SHOW, userId), padUuid);
+  }
+
+  @GetMapping(path = "/hide",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public void hide(
+    @RequestParam("uuid") String padUuid
+  )
+    throws IOException
+  {
+    log.debug("hide padUuid = {}", padUuid);
+    signaturePadWebSocketHandler
+      .fireEventToPad(new DtoEvent(DtoEvent.EVENT_HIDE, "hide"), padUuid);
   }
 
 }

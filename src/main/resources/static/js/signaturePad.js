@@ -22,6 +22,7 @@
 import { switchLang, defaultLang } from './i18n.js';
 import { showAlert } from './alerts.js';
 import { userInfo, userId } from './userInfo.js';
+import { startCountdown } from './countdown.js';
 
 const wrapper = document.getElementById("signature-pad");
 const clearButton = wrapper.querySelector("[data-action=clear]");
@@ -53,6 +54,7 @@ export function activateSignaturePad(active)
     document.getElementById("signpad-active").style.display = "block";
     document.getElementById("signpad-standby").style.display = "none";
     resizeCanvas();
+    startCountdown();
   }
   else
   {

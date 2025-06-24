@@ -36,8 +36,8 @@ public class DtoEvent
 
   public static final String EVENT_SHOW = "show";
 
-  public static final String EVENT_REMOVE = "remove";
-  
+  public static final String EVENT_HIDE = "hide";
+
   public static final String EVENT_CLEAR = "clear";
 
   public DtoEvent(String event)
