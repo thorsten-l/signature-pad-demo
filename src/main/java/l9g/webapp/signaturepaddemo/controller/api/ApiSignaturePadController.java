@@ -91,11 +91,11 @@ public class ApiSignaturePadController
   {
     log.debug("waitForResponse {}", padUuid);
 
-    DeferredResult<ResponsePayload> checkDeferred = waitingRequests.get(padUuid);
+    DeferredResult<ResponsePayload> oldDeferred = waitingRequests.get(padUuid);
 
-    if(checkDeferred != null)
+    if(oldDeferred != null)
     {
-      checkDeferred.setResult(null);
+      oldDeferred.setResult(new ResponsePayload("cancel", null));
       waitingRequests.remove(padUuid);
     }
 
@@ -106,7 +106,23 @@ public class ApiSignaturePadController
       log.warn("Timeout bei padUuid={}", padUuid);
       try
       {
-        hide(padUuid);
+        DeferredResult<ResponsePayload> checkDeferred = waitingRequests.get(padUuid);
+        if(checkDeferred != null)
+        {
+          if(checkDeferred.equals(deferred))
+          {
+            log.debug("sending hide message");
+            hide(padUuid);
+          }
+          else
+          {
+            log.debug("checkDeferred != deferred");
+          }
+        }
+        else
+        {
+          log.debug("checkDeferred == null");
+        }
       }
       catch(IOException ex)
       {
