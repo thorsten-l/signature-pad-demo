@@ -34,3 +34,7 @@ build/
 
 *.bak
 .DS_Store
+
+config.yaml
+config-off.yaml
+server.p12
