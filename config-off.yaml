@@ -1,0 +1,15 @@
+
+logging:
+  level:
+    root: INFO
+    l9g: TRACE
+
+scheduler:
+  heartbeat:
+    enabled: false
+    rate: 15000
+
+app:
+  development: true
+  base-url: https://signpad.dev.sonia.de:3443
+  ws-url: wss://signpad.dev.sonia.de:3443
