@@ -20,5 +20,4 @@ import './signaturePad.js';
 import './websocket.js';
 import './alerts.js';
 import './countdown.js';
-import './scanner.js';
 import './page.js';
