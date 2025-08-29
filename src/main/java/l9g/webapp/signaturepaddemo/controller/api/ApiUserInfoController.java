@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
+ * REST API controller for user information retrieval.
+ * Provides endpoints for fetching user details and associated data
+ * for signature pad operations.
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
@@ -43,27 +46,44 @@ import org.springframework.web.server.ResponseStatusException;
                 produces = MediaType.APPLICATION_JSON_VALUE)
 public class ApiUserInfoController
 {
+  /** Service for authentication and authorization operations */
   private final AuthService authService;
 
+  /**
+   * Retrieves user information for the specified user ID.
+   * Returns comprehensive user data including personal details, addresses,
+   * and profile photo for display on signature pad devices.
+   * 
+   * @param padUuid the unique identifier of the requesting signature pad
+   * @param cardNumber the identifier of the user whose information is requested
+   * @return user information data transfer object containing all user details
+   * @throws IOException if authentication fails or resource access fails
+   * @throws ResponseStatusException if user not found
+   */
   @GetMapping(
     produces = MediaType.APPLICATION_JSON_VALUE)
   public DtoUserInfo userinfo(
     @RequestHeader("SIGNATURE_PAD_UUID") String padUuid,
-    @RequestParam("userid") String userId
+    @RequestParam("card") String cardNumber
   )
     throws IOException
   {
-    log.debug("userinfo called for {}", userId);
+    log.debug("userinfo called for card number '{}'", cardNumber);
+    
+    // Authenticate signature pad
     authService.authCheck(padUuid, true);
 
-    if (!userId.equalsIgnoreCase("user123"))
+    // Demo implementation - only supports user123
+    if (!cardNumber.equalsIgnoreCase("091600045759"))
     {
+      log.error("ERROR: card number not found {}", cardNumber);
       throw new ResponseStatusException(
         HttpStatus.NOT_FOUND,
-        "ERROR: Unknown userid"
+        "ERROR: Unknown card number"
       );
     }
     
+    // Create demo address information
     DtoAddress semester = new DtoAddress(
       "c/o M. Maier", "Musterstr. Str 1701", "38302", "Wolfenbüttel", 
       "Niedersachsen", "Deutschland");
@@ -71,6 +91,7 @@ public class ApiUserInfoController
       null, "Neuer Weg 4711", "38302", "Wolfenbüttel", 
       "Niedersachsen", "Deutschland");
 
+    // Load and encode demo profile photo
     String jpegPhoto;
     ClassPathResource imgFile = new ClassPathResource("demo/MarieMuster.jpg");
 
@@ -81,6 +102,7 @@ public class ApiUserInfoController
       jpegPhoto = "data:image/jpeg;base64," + base64;
     }
 
+    // Create and return user information object
     DtoUserInfo userInfo = new DtoUserInfo(
       jpegPhoto, "Marie", "Muster", "user123", "m.muster@the.net", 
       "01.01.2005", semester, home);

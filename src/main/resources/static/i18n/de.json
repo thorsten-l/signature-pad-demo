@@ -21,10 +21,12 @@
   "alert.error.websocket.text": "WebSocket-Verbindungsfehler.",
   "alert.error.connectionLost.title": "FEHLER",
   "alert.error.connectionLost.text": "WebSocket-Verbindung verloren!",
-  "alert.success.signatureSent.title": "ERGOLG",
+  "alert.success.signatureSent.title": "ERFOLG",
   "alert.success.signatureSent.text": "Unterschrift erfolgreich gesendet.",
   "alert.error.sendingSignature.title": "FEHLER",
   "alert.error.sendingSignature.text": "Fehler beim Senden der Unterschrift: {0}",
   "alert.error.unregistered.title": "FEHLER",
-  "alert.error.unregistered.text": "Dieses Signatur-Pad ist nicht registriert! Bitte kontaktieren Sie Ihren Administrator."
+  "alert.error.unregistered.text": "Dieses Signatur-Pad ist nicht registriert! Bitte kontaktieren Sie Ihren Administrator.",
+  "alert.error.userNotFound.title": "FEHLER",
+  "alert.error.userNotFound.text": "Benutzer wurde nicht gefunden."
 }

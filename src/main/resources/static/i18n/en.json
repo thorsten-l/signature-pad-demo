@@ -26,5 +26,7 @@
   "alert.error.sendingSignature.title": "ERROR",
   "alert.error.sendingSignature.text": "Error sending signature: {0}",
   "alert.error.unregistered.title": "ERROR",
-  "alert.error.unregistered.text": "This signature pad is not registered! Please contact your administrator."
+  "alert.error.unregistered.text": "This signature pad is not registered! Please contact your administrator.",
+  "alert.error.userNotFound.title": "ERROR",
+  "alert.error.userNotFound.text": "User not found."
 }

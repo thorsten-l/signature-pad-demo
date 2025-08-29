@@ -1,0 +1,3 @@
+ich habe die funktionen showScanner und showStartPage neu im quelltext positioniert, da sie sonst "undefined" waren
+füge bitte ebenfalls zur <!-- 2. Foto-Section --> einen "Abbruch" button hinzu, der zurück auf die  
+<!-- 0. Start Page --> springt. 

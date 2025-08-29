@@ -51,8 +51,10 @@ export function activateSignaturePad(active)
 {
   if (active)
   {
+    document.getElementById('scanner-pages').classList.add('d-none');
     document.getElementById("signpad-active").style.display = "block";
     document.getElementById("signpad-standby").style.display = "none";
+    signaturePad.clear();
     resizeCanvas();
     startCountdown();
   }
@@ -74,6 +76,7 @@ cancelButton.addEventListener("click", () => {
   console.log("Cancel button pressed");
   showAlert("alert.cancel.title", "alert.cancel.text", "error");
   activateSignaturePad(false);
+  document.dispatchEvent(new CustomEvent('signatureSubmitted'));
 
   var payload = {};
   payload.userId = userId;
@@ -139,6 +142,8 @@ okButton.addEventListener("click", async () => {
     });
 
     activateSignaturePad(false);
+    
+    document.dispatchEvent(new CustomEvent('signatureSubmitted'));
 
     if (response.ok)
     {

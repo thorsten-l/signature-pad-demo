@@ -56,6 +56,9 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
+ * REST API controller for signature pad operations and management.
+ * Provides endpoints for signature pad authentication, validation, signature capture,
+ * QR code generation, and real-time communication with signature pad devices.
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
@@ -66,31 +69,51 @@ import org.springframework.web.server.ResponseStatusException;
                 produces = MediaType.APPLICATION_JSON_VALUE)
 public class ApiSignaturePadController
 {
+  /** Path template for signature pad validation endpoint */
   private static final String VALIDATE_NEW_PAD = "/admin/validate-new-pad";
 
+  /** Service for managing signature pad operations and data persistence */
   private final SignaturePadService signaturePadService;
 
+  /** WebSocket handler for real-time communication with signature pad devices */
   private final SignaturePadWebSocketHandler signaturePadWebSocketHandler;
 
+  /** Service for managing signed JWT operations and storage */
   private final SignedJwtService signedJwtService;
 
+  /** Service for authentication and authorization operations */
   private final AuthService authService;
 
+  /** 
+   * Map storing deferred results for asynchronous signature requests.
+   * Key: signature pad UUID, Value: deferred result waiting for response
+   */
   private final Map<String, DeferredResult<ResponsePayload>> waitingRequests =
     new ConcurrentHashMap<>();
 
+  /** Base URL of the application for generating absolute URLs */
   @Value("${app.base-url}")
   private String appBaseUrl;
 
+  /** Timeout in milliseconds for signature pad operations */
   @Value("${app.signature-pad.timeout:180000}")
   private long signaturePadTimeout;
 
+  /**
+   * Establishes a long-polling connection to wait for signature responses.
+   * Creates a deferred result that will be completed when a signature is captured
+   * or when the request times out.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @return deferred result that will contain the signature response
+   */
   @GetMapping("/wait-for-response")
   @ResponseBody
   public DeferredResult<ResponsePayload> waitForResponse(@RequestParam(name = "uuid") String padUuid)
   {
     log.debug("waitForResponse {}", padUuid);
 
+    // Cancel any existing deferred request for this signature pad
     DeferredResult<ResponsePayload> oldDeferred = waitingRequests.get(padUuid);
 
     if(oldDeferred != null)
@@ -99,20 +122,23 @@ public class ApiSignaturePadController
       waitingRequests.remove(padUuid);
     }
 
+    // Create new deferred result with configured timeout
     DeferredResult<ResponsePayload> deferred = new DeferredResult<>(signaturePadTimeout);
 
+    // Configure timeout behavior
     deferred.onTimeout(() ->
     {
       log.warn("Timeout bei padUuid={}", padUuid);
       try
       {
+        // Check if this deferred result is still the active one
         DeferredResult<ResponsePayload> checkDeferred = waitingRequests.get(padUuid);
         if(checkDeferred != null)
         {
           if(checkDeferred.equals(deferred))
           {
             log.debug("sending hide message");
-            hide(padUuid);
+            hide(padUuid); // Hide signature pad interface on timeout
           }
           else
           {
@@ -132,6 +158,7 @@ public class ApiSignaturePadController
       deferred.setResult(payload);
     });
 
+    // Clean up when request completes
     deferred.onCompletion(() -> waitingRequests.remove(padUuid));
     waitingRequests.put(padUuid, deferred);
 
@@ -139,6 +166,15 @@ public class ApiSignaturePadController
     return deferred;
   }
 
+  /**
+   * Generates a QR code image for signature pad connection.
+   * Creates a QR code containing the validation URL that signature pads can scan
+   * to establish connection with the system.
+   * 
+   * @param uuid the unique identifier of the signature pad
+   * @param response HTTP response to write the QR code image to
+   * @throws IOException if QR code generation or response writing fails
+   */
   @GetMapping(path = "/connect-qrcode", produces = MediaType.IMAGE_PNG_VALUE)
   public void connectQrcode(
     @RequestParam("uuid") String uuid,
@@ -146,6 +182,7 @@ public class ApiSignaturePadController
   )
     throws IOException
   {
+    // Construct the validation URL for the QR code
     String targetUrl = appBaseUrl
       + VALIDATE_NEW_PAD
       + "?uuid="
@@ -156,12 +193,14 @@ public class ApiSignaturePadController
     int width = 300;
     int height = 300;
 
+    // Configure QR code generation parameters
     Map<EncodeHintType, Object> hints = new HashMap<>();
     hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
     hints.put(EncodeHintType.MARGIN, 2);
 
     try
     {
+      // Generate QR code and write to response
       QRCodeWriter qrWriter = new QRCodeWriter();
       BitMatrix bitMatrix = qrWriter.encode(targetUrl, BarcodeFormat.QR_CODE, width, height, hints);
 
@@ -176,6 +215,17 @@ public class ApiSignaturePadController
     }
   }
 
+  /**
+   * Validates a signature pad by processing its validation JWT.
+   * Extracts the public key from the JWT and marks the signature pad as validated
+   * in the system, enabling it for signature operations.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @param signatureJwt the validation JWT containing public key and environment info
+   * @throws IOException if signature pad data access fails
+   * @throws ParseException if JWT parsing fails
+   * @throws ResponseStatusException if validation fails or pad not found
+   */
   @PostMapping(path = "/validate",
                consumes = MediaType.TEXT_PLAIN_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -188,17 +238,20 @@ public class ApiSignaturePadController
     log.debug("validate called");
     log.debug("Received JWT length: {}", signatureJwt.length());
 
+    // Authenticate signature pad and verify JWT
     SignaturePad signaturePad = authService.authCheck(padUuid, false);
     SignedJWT signedJWT = authService.verifyJwt(signaturePad, signatureJwt);
 
     try
     {
+      // Extract public key from JWT claims
       Map<String, Object> publicJwkMap = signedJWT.getJWTClaimsSet().getJSONObjectClaim("publicJwk");
 
       log.trace("public jwk : {}", publicJwkMap);
 
       JWK jwk = JWK.parse(publicJwkMap);
 
+      // Ensure the key is an RSA key as expected
       if( ! (jwk instanceof RSAKey))
       {
         throw new ResponseStatusException(
@@ -206,6 +259,7 @@ public class ApiSignaturePadController
         );
       }
 
+      // Store validation information and mark as validated
       signaturePad.setPublicJwk(publicJwkMap);
       signaturePad.setClientEnvironment(signedJWT.getJWTClaimsSet().getJSONObjectClaim("clientEnvironment"));
       signaturePad.setValidated(true);
@@ -224,6 +278,17 @@ public class ApiSignaturePadController
     }
   }
 
+  /**
+   * Processes a signature captured by a signature pad.
+   * Verifies the signature JWT, extracts signature data, and notifies waiting
+   * clients about the signature completion.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @param signatureJwt the signature JWT containing captured signature data
+   * @throws IOException if signature pad data access fails
+   * @throws ParseException if JWT parsing fails
+   * @throws ResponseStatusException if verification fails
+   */
   @PostMapping(path = "/signature",
                consumes = MediaType.TEXT_PLAIN_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -236,18 +301,22 @@ public class ApiSignaturePadController
     log.debug("signature called");
     log.debug("Received JWT length: {}", signatureJwt.length());
 
+    // Authenticate signature pad and verify JWT
     SignaturePad signaturePad = authService.authCheck(padUuid, true);
     SignedJWT signedJWT = authService.verifyJwt(signaturePad, signatureJwt);
 
+    // Get waiting deferred result for this signature pad
     DeferredResult<ResponsePayload> deferred = waitingRequests.get(padUuid);
 
     try
     {
+      // Extract signature information from JWT
       String issuer = signedJWT.getJWTClaimsSet().getIssuer();
       String kid = signedJWT.getHeader().getKeyID();
       String sigpngBase64 = signedJWT.getJWTClaimsSet().getClaimAsString("sigpng");
       String sigsvgBase64 = signedJWT.getJWTClaimsSet().getClaimAsString("sigsvg");
 
+      // Extract and format timestamp information
       Instant iatInstant = signedJWT.getJWTClaimsSet().getIssueTime().toInstant();
       long iatEpoch = iatInstant.getEpochSecond();
       DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -262,8 +331,11 @@ public class ApiSignaturePadController
       log.debug("name={}", signedJWT.getJWTClaimsSet().getClaimAsString("name"));
       log.debug("mail={}", signedJWT.getJWTClaimsSet().getClaimAsString("mail"));
 
+      // Store the signed JWT for later retrieval
+      // Store the signed JWT for later retrieval
       signedJwtService.storeSignedJWT(signedJWT.getJWTClaimsSet().getSubject(), signatureJwt);
 
+      // Notify waiting client with signature data
       if(deferred != null)
       {
         ResponsePayload payload = new ResponsePayload("ok", sigpngBase64);
@@ -274,6 +346,7 @@ public class ApiSignaturePadController
     {
       log.error("Error parsing or verifying JWT", e);
 
+      // Notify waiting client of error
       if(deferred != null)
       {
         ResponsePayload payload = new ResponsePayload("error", null);
@@ -287,6 +360,15 @@ public class ApiSignaturePadController
     }
   }
 
+  /**
+   * Handles signature pad cancellation requests.
+   * Notifies waiting clients that the signature operation was cancelled
+   * by the user on the signature pad device.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @param json the cancellation request data
+   * @throws IOException if signature pad communication fails
+   */
   @PostMapping(path = "/cancel",
                consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -299,8 +381,10 @@ public class ApiSignaturePadController
     log.debug("cancel button pressed");
     log.info("json: {}", json);
 
-    SignaturePad signaturePad = authService.authCheck(padUuid, true);
+    // Authenticate signature pad
+    authService.authCheck(padUuid, true);
 
+    // Notify waiting client of cancellation
     DeferredResult<ResponsePayload> deferred = waitingRequests.get(padUuid);
     if(deferred != null)
     {
@@ -309,19 +393,35 @@ public class ApiSignaturePadController
     }
   }
 
+  /**
+   * Shows a signature request on the specified signature pad.
+   * Sends a show event to the signature pad device to display signature
+   * interface for the specified user.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @param cardNumber the identifier of the user requesting the signature
+   * @throws IOException if WebSocket communication fails
+   */
   @GetMapping(path = "/show",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public void show(
     @RequestParam("uuid") String padUuid,
-    @RequestParam("uid") String userId
+    @RequestParam("card") String cardNumber
   )
     throws IOException
   {
-    log.debug("show padUuid = {}, uid = {}", padUuid, userId);
+    log.debug("show padUuid = {}, card = {}", padUuid, cardNumber);
     signaturePadWebSocketHandler
-      .fireEventToPad(new DtoEvent(DtoEvent.EVENT_SHOW, userId), padUuid);
+      .fireEventToPad(new DtoEvent(DtoEvent.EVENT_SHOW, cardNumber), padUuid);
   }
 
+  /**
+   * Hides the signature interface on the specified signature pad.
+   * Sends a hide event to the signature pad device to clear the display.
+   * 
+   * @param padUuid the unique identifier of the signature pad
+   * @throws IOException if WebSocket communication fails
+   */
   @GetMapping(path = "/hide",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public void hide(

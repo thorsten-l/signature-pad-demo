@@ -1,0 +1,12 @@
+1. antworte auf deutsch
+2. halte dich an die fakten und denke dir nichts aus!
+src/main/resources/templates/signpad2.html ist eine single page application,
+die ausschließlich unter android mit google chrome laufen muss.
+sie verwendet bootstrap 5.3 und fontawesome 6.7
+füge unter <!-- 0. Start Page --> eine startseite ein die, statt  <!-- 1. Scanner-Section -->
+als erstes gezeigt wird. 
+die startpage soll ein numerisches eingabefeld für 12 zahlen mit dem Label "Bibliotheks-Barcode" 
+anzeigen sowie wie buttons "Löschen" und "Senden".
+ein dritter button "Barcodescanner" soll bei betätigung dann den <!-- 1. Scanner-Section --> anzeigen.
+zusätzlich soll auf der <!-- 1. Scanner-Section --> Seite noch ein button "Abbruch" hinzugefügt werden, der zurück auf <!-- 0. Start Page -->
+springt.

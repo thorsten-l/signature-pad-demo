@@ -79,7 +79,7 @@ limitations under the License.
     <script th:inline="javascript">
       const padUuid = /*[[${pad.uuid}]]*/ 'unknown-uuid';
       const padName = /*[[${pad.name}]]*/ 'unknown-name';
-      const userId = /*[[${userId}]]*/ 'unknown-userid';
+      const cardNumber = /*[[${card}]]*/ 'unknown-card';
 
       const duration = 180; // Sek.
       let remaining = duration;
@@ -108,10 +108,10 @@ limitations under the License.
 
       console.log(padUuid);
       console.log(padName);
-      console.log(userId);
+      console.log(cardNumber);
       console.log("send show ...");
 
-      const url = `/api/v1/signature-pad/show?uuid=${encodeURIComponent(padUuid)}&uid=${encodeURIComponent(userId)}`;
+      const url = `/api/v1/signature-pad/show?uuid=${encodeURIComponent(padUuid)}&card=${encodeURIComponent(cardNumber)}`;
       fetch(url, {method: 'GET'});
 
       console.log("wait ...");

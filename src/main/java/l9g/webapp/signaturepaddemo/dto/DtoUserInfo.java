@@ -16,7 +16,19 @@
 package l9g.webapp.signaturepaddemo.dto;
 
 /**
+ * Data Transfer Object representing user information for signature pad operations.
+ * Contains personal details, contact information, and address data that can be
+ * displayed on signature pad devices during the signing process.
  *
+ * @param jpegPhoto Base64-encoded JPEG photo of the user (with data URI prefix)
+ * @param firstname User's first name
+ * @param lastname User's last name  
+ * @param uid Unique user identifier
+ * @param mail User's email address
+ * @param birthday User's birth date as string
+ * @param semster Semester/temporary address information
+ * @param home Home address information
+ * 
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
 public record DtoUserInfo( 

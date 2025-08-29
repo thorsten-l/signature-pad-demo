@@ -28,6 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -58,7 +60,7 @@ public class SignaturePadWebSocketConfig implements WebSocketConfigurer
    * @param registry the WebSocketHandlerRegistry to register handlers with
    */
   @Override
-  public void registerWebSocketHandlers(WebSocketHandlerRegistry registry)
+  public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry)
   {
     log.debug("registerWebSocketHandlers");
 
@@ -88,10 +90,11 @@ public class SignaturePadWebSocketConfig implements WebSocketConfigurer
   {
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest request,
-      ServerHttpResponse response,
-      WebSocketHandler wsHandler,
-      Map<String, Object> attributes)
+    public boolean beforeHandshake(
+      @NonNull ServerHttpRequest request,
+      @NonNull ServerHttpResponse response,
+      @NonNull WebSocketHandler wsHandler,
+      @NonNull Map<String, Object> attributes)
       throws HandshakeFailureException, IOException
     {
       log.debug("*** beforeHandshake");
@@ -149,10 +152,10 @@ public class SignaturePadWebSocketConfig implements WebSocketConfigurer
 
     @Override
     public void afterHandshake(
-      ServerHttpRequest request,
-      ServerHttpResponse response,
-      WebSocketHandler wsHandler,
-      Exception exception)
+      @NonNull ServerHttpRequest request,
+      @NonNull ServerHttpResponse response,
+      @NonNull WebSocketHandler wsHandler,
+      @Nullable Exception exception)
     {
     }
 

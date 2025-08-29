@@ -94,21 +94,12 @@ function connect()
 
     if (dtoEvent.event === "show")
     {
-      clearPage();
       console.log("show event received");
       // try
-      showUserinfo(dtoEvent.message).then(() => {
-        activateSignaturePad(true);
-        resizeCanvas();
-        signaturePad.clear();
-      }).catch(error => {
-        console.error('Fehler beim Laden der Userinfo:', error);
-        if (error.status === 404)
-        {
-          document.dispatchEvent(new CustomEvent('signatureSubmitted'));
-          showAlert("alert.error.userNotFound.title", "alert.error.userNotFound.text", "error");
-        }
-      });
+      showUserinfo(dtoEvent.message);
+      activateSignaturePad(true);
+      //
+      resizeCanvas();
       signaturePad.clear();
     }
 
@@ -116,10 +107,8 @@ function connect()
     {
       console.log("hide event received");
       switchLang(defaultLang);
-      clearPage();
       signaturePad.clear();
       activateSignaturePad(false);
-      document.dispatchEvent(new CustomEvent('signatureSubmitted'));
     }
 
     if (dtoEvent.event === "error")

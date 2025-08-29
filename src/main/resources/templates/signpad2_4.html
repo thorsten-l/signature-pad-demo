@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!--
+Copyright 2025 Thorsten Ludewig (t.ludewig@gmail.com).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Perso-Karten-Scanner</title>
+
+    <!-- Bootstrap & FontAwesome via WebJars -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.7.2/css/all.min.css}"/>
+
+    <style>
+      /* EC-/ID-Karte (ID-1, ISO/IEC 7810): 85,60 × 53,98 mm ≈ 1,585 : 1 */
+      .card-viewfinder {
+        position: relative;
+        width: 90%;
+        max-width: 600px;
+        margin: 0 auto;
+        aspect-ratio: 1.585 / 1;
+        background: #000;
+        border: 4px solid #88e;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .card-viewfinder video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Foto-Wrapper orientiert an ID-Card-Format */
+      .photo-viewfinder {
+        position: relative;
+        width: 80%;
+        max-width: 480px;
+        margin: 1.5rem auto;
+        aspect-ratio: 1.585 / 1;
+        border: 2px dashed #6c757d;
+        border-radius: 6px;
+        overflow: hidden;
+        display: none;
+      }
+      .photo-viewfinder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .d-none {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+
+    <div class="container py-4">
+      <h1 class="mb-4"><i class="fas fa-id-card"></i> Perso-Workflow</h1>
+
+      <!-- 0. Start Page -->
+      <div id="start-page">
+        <div class="mb-3">
+          <label for="library-barcode" class="form-label">Bibliotheks-Barcode</label>
+          <input type="number" class="form-control" id="library-barcode" placeholder="12-stelligen Barcode eingeben">
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('library-barcode').value = ''"><i class="fas fa-eraser"></i> Löschen</button>
+        <button type="button" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Senden</button>
+        <button type="button" class="btn btn-info" onclick="showScanner()"><i class="fas fa-barcode"></i> Barcodescanner</button>
+      </div>
+
+      <!-- 1. Scanner-Section -->
+      <div id="scanner" class="d-none">
+        <p>Smartcard Barcode einlesen:</p>
+        <div class="card-viewfinder">
+          <video id="video" autoplay muted playsinline></video>
+        </div>
+        <div id="message" class="mt-3 alert alert-info d-none"></div>
+        <button type="button" class="btn btn-danger mt-3" onclick="showStartPage()"><i class="fas fa-times"></i> Abbruch</button>
+      </div>
+
+      <!-- 2. Foto-Section -->
+      <div id="photo-section" class="mt-4 d-none">
+        <p>Fotos aufnehmen:</p>
+        <button id="btn-front" class="btn btn-primary me-2">
+          <i class="fas fa-camera"></i> Vorderseite
+        </button>
+        <button id="btn-back" class="btn btn-secondary">
+          <i class="fas fa-camera"></i> Rückseite
+        </button>
+
+        <div id="photo-msg" class="mt-3"></div>
+
+        <!-- Live-Vorschau der Aufnahmen im ID-Karten-Format -->
+        <div id="preview-front" class="photo-viewfinder">
+          <img id="img-front" alt="Vorderseite Vorschau"/>
+        </div>
+        <div id="preview-back" class="photo-viewfinder">
+          <img id="img-back" alt="Rückseite Vorschau"/>
+        </div>
+
+        <!-- Neuer Weiter-Button -->
+        <div class="text-center mt-4">
+          <a id="btn-next" href="/signature-pad"
+             class="btn btn-success btn-lg d-none">
+            Weiter zur Unterschrift
+          </a>
+        </div>
+
+        <div class="text-center mt-2">
+          <button type="button" class="btn btn-danger" onclick="showStartPage()"><i class="fas fa-times"></i> Abbruch</button>
+        </div>
+
+      </div>
+
+      <!-- versteckte File-Inputs -->
+      <input type="file" id="file-front" accept="image/*" capture="environment" class="d-none"/>
+      <input type="file" id="file-back"  accept="image/*" capture="environment" class="d-none"/>
+    </div>
+
+    <script th:inline="javascript">
+
+
+      // Hilfsfunktionen
+      function showScanner()
+      {
+        document.getElementById('start-page').classList.add('d-none');
+        document.getElementById('scanner').classList.remove('d-none');
+      }
+
+      function showStartPage()
+      {
+        document.getElementById('scanner').classList.add('d-none');
+        document.getElementById('photo-section').classList.add('d-none');
+        document.getElementById('start-page').classList.remove('d-none');
+      }
+
+      /*<![CDATA[*/
+      document.addEventListener('DOMContentLoaded', () => {
+        if (!('BarcodeDetector' in window))
+        {
+          showMsg('BarcodeDetector nicht unterstützt', 'danger');
+          return;
+        }
+
+        let cardNumber = null;
+        let uploadedFront = false;
+        let uploadedBack = false;
+
+        const btnNext = document.getElementById('btn-next');
+        const video = document.getElementById('video');
+        const message = document.getElementById('message');
+        const scanner = document.getElementById('scanner');
+        const photoSec = document.getElementById('photo-section');
+        const photoMsg = document.getElementById('photo-msg');
+        const btnFront = document.getElementById('btn-front');
+        const btnBack = document.getElementById('btn-back');
+        const inputF = document.getElementById('file-front');
+        const inputB = document.getElementById('file-back');
+        const previewF = document.getElementById('preview-front');
+        const previewB = document.getElementById('preview-back');
+        const imgFront = document.getElementById('img-front');
+        const imgBack = document.getElementById('img-back');
+
+        // Kamera-Stream starten
+        navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}})
+                .then(stream => video.srcObject = stream)
+                .catch(err => showMsg('Kamera-Fehler: ' + err.message, 'danger'));
+
+        // BarcodeDetector (Code-39)
+        const detector = new BarcodeDetector({formats: ['code_39']});
+
+        // Scan-Loop
+        async function scanLoop()
+        {
+          try
+          {
+            const barcodes = await detector.detect(video);
+            if (barcodes.length)
+            {
+              cardNumber = barcodes[0].rawValue;
+              sendCardNumber(cardNumber);
+              return;
+            }
+          }
+          catch (e)
+          {
+            console.error(e);
+            showMsg('Scan-Fehler: ' + e.message, 'danger');
+            return;
+          }
+          requestAnimationFrame(scanLoop);
+        }
+        video.addEventListener('playing', () => scanLoop());
+
+        // Kartennummer senden
+        function sendCardNumber(code)
+        {
+          showMsg('Kartennummer erkannt: ' + code, 'success');
+          fetch('/api/v1/signature-pad/scan', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({cardNumber: code})
+          })
+                  .then(res => res.json())
+                  .then(() => {
+                    showMsg('Kartennummer übernommen', 'info');
+                    scanner.classList.add('d-none');
+                    photoSec.classList.remove('d-none');
+                  })
+                  .catch(e => showMsg('POST /api/v1/signature-pad/scan fehlgeschlagen: ' + e, 'danger'));
+        }
+
+        // Foto-Workflow
+        btnFront.addEventListener('click', () => inputF.click());
+        btnBack.addEventListener('click', () => inputB.click());
+
+        inputF.addEventListener('change', () => handlePhoto('front', inputF.files[0]));
+        inputB.addEventListener('change', () => handlePhoto('back', inputB.files[0]));
+
+        function handlePhoto(side, file)
+        {
+          if (!cardNumber || !file)
+            return;
+          const reader = new FileReader();
+          reader.onload = e => {
+            if (side === 'front')
+            {
+              imgFront.src = e.target.result;
+              previewF.style.display = 'block';
+              uploadedFront = true;
+            }
+            else
+            {
+              imgBack.src = e.target.result;
+              previewB.style.display = 'block';
+              uploadedBack = true;
+            }
+            checkAllUploaded();
+          };
+          reader.readAsDataURL(file);
+
+          uploadPhoto(side, file);
+        }
+
+        function checkAllUploaded()
+        {
+          if (uploadedFront && uploadedBack)
+          {
+            btnNext.classList.remove('d-none');
+          }
+        }
+
+
+        function uploadPhoto(side, file)
+        {
+          const fd = new FormData();
+          fd.append('cardNumber', cardNumber);
+          fd.append('side', side);
+          fd.append('file', file, file.name);
+
+          showPhotoMsg('Sende ' + side + '…', 'info');
+          fetch('/api/v1/signature-pad/photo', {method: 'POST', body: fd})
+                  .then(r => r.json())
+                  .then(() => showPhotoMsg('Seite ' + side + ' hochgeladen', 'success'))
+                  .catch(e => showPhotoMsg('Upload-Fehler ' + side + ': ' + e, 'danger'));
+        }
+
+
+        function showMsg(text, type)
+        {
+          message.textContent = text;
+          message.className = `mt-3 alert alert-${type}`;
+          message.classList.remove('d-none');
+        }
+        function showPhotoMsg(text, type)
+        {
+          photoMsg.textContent = text;
+          photoMsg.className = `mt-2 alert alert-${type}`;
+        }
+      });
+      /*]]>*/
+    </script>
+  </body>
+</html>

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.1</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
-      <version>10.3</version>
+      <version>10.4.2</version>
     </dependency>
     
     <dependency>
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>5.3.6</version>
+      <version>5.3.7</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

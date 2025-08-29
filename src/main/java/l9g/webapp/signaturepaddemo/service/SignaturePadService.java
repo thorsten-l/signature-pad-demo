@@ -27,16 +27,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Service class for managing signature pad operations and data persistence.
+ * Handles creation, storage, and retrieval of signature pad configurations
+ * using JSON file-based storage system.
+ *
+ * @author Thorsten Ludewig (t.ludewig@gmail.com)
+ */
 @Service
 @Slf4j
 public class SignaturePadService
 {
+  /** Object mapper for JSON serialization/deserialization with pretty printing */
   private final ObjectMapper objectMapper = new ObjectMapper()
     .enable(SerializationFeature.INDENT_OUTPUT);
 
+  /** Directory path for storing signature pad configuration files */
   @Value("${app.signature-pad.store-dir:${user.home}/.signaturepads}")
   private String storeDir;
 
+  /**
+   * Initializes the service by creating the storage directory if it doesn't exist.
+   * Called automatically after bean construction.
+   * 
+   * @throws IOException if directory creation fails
+   */
   @PostConstruct
   public void init()
     throws IOException
@@ -49,6 +64,14 @@ public class SignaturePadService
     }
   }
 
+  /**
+   * Creates a new signature pad with the specified name.
+   * Generates a unique UUID for the signature pad and stores it persistently.
+   * 
+   * @param name the display name for the new signature pad
+   * @return the newly created signature pad instance
+   * @throws IOException if storage operation fails
+   */
   public SignaturePad createNewSignaturePad(String name)
     throws IOException
   {
@@ -57,6 +80,13 @@ public class SignaturePadService
     return signaturePad;
   }
 
+  /**
+   * Retrieves a signature pad by its unique identifier.
+   * 
+   * @param uuid the unique identifier of the signature pad
+   * @return the signature pad instance or null if not found
+   * @throws IOException if file access fails
+   */
   public SignaturePad getSignaturePadByUUID(String uuid)
     throws IOException
   {
@@ -64,8 +94,11 @@ public class SignaturePadService
   }
 
   /**
-   * Speichert das gegebene SignaturePad-Objekt als JSON-Datei unter
-   * {storeDir}/{uuid}.json.
+   * Stores the given signature pad object as a JSON file.
+   * The file is saved as {storeDir}/{uuid}.json with pretty-printed formatting.
+   * 
+   * @param pad the signature pad to store
+   * @throws IOException if file writing fails
    */
   public void storeSignaturePad(SignaturePad pad)
     throws IOException
@@ -77,8 +110,12 @@ public class SignaturePadService
   }
 
   /**
-   * Lädt ein SignaturePad-Objekt von der JSON-Datei
-   * {storeDir}/{uuid}.json. Gibt null zurück, wenn die Datei nicht existiert.
+   * Loads a signature pad object from the JSON file {storeDir}/{uuid}.json.
+   * Returns null if the file does not exist.
+   * 
+   * @param uuid the unique identifier of the signature pad to load
+   * @return the signature pad instance or null if file not found
+   * @throws IOException if file reading or JSON parsing fails
    */
   public SignaturePad loadSignaturePad(String uuid)
     throws IOException

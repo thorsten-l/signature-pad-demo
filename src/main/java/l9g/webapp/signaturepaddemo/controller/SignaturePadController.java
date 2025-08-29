@@ -25,6 +25,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
+ * Controller responsible for handling signature pad related web requests.
+ * Provides endpoints for displaying signature pad interfaces with proper
+ * internationalization and WebSocket configuration.
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
@@ -33,12 +36,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class SignaturePadController
 {
+  /** WebSocket base URL for real-time communication with signature pad devices */
   @Value("${app.ws-url}")
   private String wsBaseUrl;
 
+  /** Flag indicating whether heartbeat functionality is enabled for connection monitoring */
   @Value("${scheduler.heartbeat.enabled}")
   private boolean heartbeatEnabled;
 
+  /**
+   * Displays the main signature pad interface.
+   * Sets up the necessary model attributes for localization and WebSocket connectivity.
+   * 
+   * @param model Spring MVC model for passing data to the view
+   * @return the name of the signature-pad template to render
+   */
   @GetMapping("/signature-pad")
   public String signaturePad(Model model)
   {
@@ -48,7 +60,27 @@ public class SignaturePadController
     model.addAttribute("locale", locale.toString());
     model.addAttribute("wsBaseUrl", wsBaseUrl);
     model.addAttribute("heartbeatEnabled", heartbeatEnabled);
-    return "signature-pad";
+    return "signpad2";
+    // return "signature-pad";
+  }
+  
+  /**
+   * Displays an alternative signature pad interface (version 2).
+   * Similar to the main signature pad but with different UI implementation.
+   * 
+   * @param model Spring MVC model for passing data to the view
+   * @return the name of the signpad2 template to render
+   */
+  @GetMapping("/signpad2")
+  public String signaturePad2(Model model)
+  {
+    log.debug("signpad2");
+    Locale locale = LocaleContextHolder.getLocale();
+    log.debug("locale={}", locale);
+    model.addAttribute("locale", locale.toString());
+    model.addAttribute("wsBaseUrl", wsBaseUrl);
+    model.addAttribute("heartbeatEnabled", heartbeatEnabled);
+    return "signpad2";
   }
 
 }
