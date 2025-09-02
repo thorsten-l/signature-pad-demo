@@ -80,19 +80,19 @@ limitations under the License.
           <label for="library-barcode" class="form-label fs-4">Bibliotheks-Barcode</label>
           <input type="number" class="form-control form-control-lg" id="library-barcode" placeholder="12-stelligen Barcode eingeben">
         </div>
-        <button type="button" class="btn btn-secondary btn-lg" onclick="document.getElementById('library-barcode').value = ''"><i class="fas fa-eraser"></i> Löschen</button>
-        <button type="button" class="btn btn-primary btn-lg" id="btn-send-barcode"><i class="fas fa-paper-plane"></i> Senden</button>
+        <button type="button" class="btn btn-secondary btn-lg me-2" onclick="document.getElementById('library-barcode').value = ''"><i class="fas fa-eraser"></i> Löschen</button>
+        <button type="button" class="btn btn-primary btn-lg me-2" id="btn-send-barcode"><i class="fas fa-paper-plane"></i> Senden</button>
         <button type="button" class="btn btn-info btn-lg" id="btn-show-scanner"><i class="fas fa-barcode"></i> Barcodescanner</button>
       </div>
 
       <!-- 1. Scanner-Section -->
       <div id="scanner" class="d-none">
-        <p>Smartcard Barcode einlesen:</p>
+        <p class="fs-4">Smartcard Barcode einlesen:</p>
         <div class="card-viewfinder">
           <video id="video" autoplay muted playsinline></video>
         </div>
         <div id="message" class="mt-3 alert alert-info d-none"></div>
-        <button type="button" class="btn btn-danger mt-3" id="btn-cancel-scan"><i class="fas fa-times"></i> Abbruch</button>
+        <button type="button" class="btn btn-danger btn-lg mt-3" id="btn-cancel-scan"><i class="fas fa-times"></i> Abbruch</button>
       </div>
 
       <!-- 2. Foto-Section -->
@@ -104,12 +104,15 @@ limitations under the License.
             <div id="userinfo-userid-preview"></div>
           </div>
         </div>
-        <p><em>Ausweis-Fotos aufnehmen:</em></p>
-        <button id="btn-front" class="btn btn-primary me-2">
+        <p class="fs-4">Ausweis-Fotos aufnehmen:</p>
+        <button id="btn-front" class="btn btn-primary btn-lg me-2">
           <i class="fas fa-camera"></i> Vorderseite
         </button>
-        <button id="btn-back" class="btn btn-secondary">
+        <button id="btn-back" class="btn btn-secondary btn-lg me-2">
           <i class="fas fa-camera"></i> Rückseite
+        </button>
+        <button id="btn-cancel-photo" class="btn btn-lg btn-danger">
+          <i class="fas fa-times"></i> Abbruch
         </button>
 
         <div id="photo-msg" class="mt-3"></div>
@@ -124,11 +127,7 @@ limitations under the License.
 
         <!-- Neuer Weiter-Button -->
         <div class="text-center mt-4">
-          <button type="button" class="btn btn-success" id="btn-next"><i class="fas fa-times"></i> Weiter zur Unterschrift</button>
-        </div>
-
-        <div class="text-center mt-2">
-          <button type="button" class="btn btn-danger" id="btn-cancel-photo"><i class="fas fa-times"></i> Abbruch</button>
+          <button type="button" class="btn btn-lg btn-success" id="btn-next"><i class="fas fa-times"></i> Weiter zur Unterschrift</button>
         </div>
 
       </div>
@@ -225,7 +224,7 @@ limitations under the License.
     <script th:src="@{/webjars/signature_pad/dist/signature_pad.umd.min.js}"></script>
     <script th:src="@{/js/sweetalert2/sweetalert2.all.min.js}"></script>
     <script th:src="@{/js/jose/index.umd.min.js}"></script>
-    <script type="module" th:src="@{/js/app2.js}"></script>
+    <script type="module" th:src="@{/js/app.js}"></script>
     
   </body>
 </html>

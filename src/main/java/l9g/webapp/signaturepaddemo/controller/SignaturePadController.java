@@ -60,26 +60,6 @@ public class SignaturePadController
     model.addAttribute("locale", locale.toString());
     model.addAttribute("wsBaseUrl", wsBaseUrl);
     model.addAttribute("heartbeatEnabled", heartbeatEnabled);
-    return "signpad2";
-    // return "signature-pad";
-  }
-  
-  /**
-   * Displays an alternative signature pad interface (version 2).
-   * Similar to the main signature pad but with different UI implementation.
-   * 
-   * @param model Spring MVC model for passing data to the view
-   * @return the name of the signpad2 template to render
-   */
-  @GetMapping("/signpad2")
-  public String signaturePad2(Model model)
-  {
-    log.debug("signpad2");
-    Locale locale = LocaleContextHolder.getLocale();
-    log.debug("locale={}", locale);
-    model.addAttribute("locale", locale.toString());
-    model.addAttribute("wsBaseUrl", wsBaseUrl);
-    model.addAttribute("heartbeatEnabled", heartbeatEnabled);
-    return "signpad2";
+    return "signature-pad";
   }
 }
