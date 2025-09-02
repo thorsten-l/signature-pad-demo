@@ -82,5 +82,4 @@ public class SignaturePadController
     model.addAttribute("heartbeatEnabled", heartbeatEnabled);
     return "signpad2";
   }
-
 }

@@ -21,3 +21,4 @@ import './websocket.js';
 import './alerts.js';
 import './countdown.js';
 import './page.js';
+import './workflow.js';

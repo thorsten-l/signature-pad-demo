@@ -44,7 +44,7 @@ export function fetchUserInfo(card, padUuid)
   });
 }
 
-
+/*
 export function showUserInfo2()
 {
 
@@ -93,7 +93,7 @@ export function showUserInfo2()
 }
 
 
-
+*/
 export function showUserinfo(card)
 {
   userId = null;
@@ -151,7 +151,7 @@ export function showUserinfo(card)
     throw err;
   });
 }
-
+/*
 export function getUserinfo(card)
 {
   userId = null;
@@ -198,3 +198,5 @@ export function getUserinfo(card)
     throw err;
   });
 }
+ * 
+ */

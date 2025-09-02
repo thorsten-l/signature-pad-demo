@@ -21,6 +21,7 @@ window.clearPage = function()
   document.getElementById('start-page').classList.add('d-none');
   document.getElementById('scanner').classList.add('d-none');
   document.getElementById('message').classList.add('d-none');
+  document.getElementById('photo-msg').classList.add('d-none');
   document.getElementById('photo-section').classList.add('d-none');
   document.getElementById('btn-next').classList.add('d-none');
   document.getElementById('preview-front').style.display = 'none';
